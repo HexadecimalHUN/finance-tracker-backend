@@ -22,17 +22,17 @@ import java.util.stream.Collectors;
 @RequestMapping("/transaction")
 @Validated
 public class TransactionController {
-    @Autowired
-    private TransactionService transactionService;
+
+    private final TransactionService transactionService;
+    private final SpendingCategoryService spendingCategoryService;
+    private final TransactionRepository transactionRepository;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
-    private  SpendingCategoryService spendingCategoryService;
-
-    @Autowired
-    private  TransactionRepository transactionRepository;
+    public  TransactionController(TransactionService transactionService, UserService userService, SpendingCategoryService spendingCategoryService, TransactionRepository transactionRepository){
+        this.transactionService = transactionService;
+        this.spendingCategoryService = spendingCategoryService;
+        this.transactionRepository = transactionRepository;
+    }
 
     //Get All transactions by category for authenticated users
     @GetMapping("/category/{categoryId}")

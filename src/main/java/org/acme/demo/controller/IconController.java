@@ -15,8 +15,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/icons")
 public class IconController {
 
+    private final IconService iconService;
+
     @Autowired
-    private IconService iconService;
+    public IconController(IconService iconService){
+        this.iconService = iconService;
+    }
 
     @GetMapping("/predefined")
     public ResponseEntity<List<IconDTO>>getPredefinedIcons(){

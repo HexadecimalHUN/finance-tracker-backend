@@ -94,7 +94,7 @@ public class UserService implements  UserDetailsService {
        newUser.setRoles(Set.of(userRole)); // Set the default role for the user
 
        return userRepository.save(newUser);
-   };
+   }
 
    @Override
    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
@@ -112,7 +112,7 @@ public class UserService implements  UserDetailsService {
                .password(appUser.getPassword())
                .authorities(authorities)
                .build();
-   };
+   }
 
    public AppUser findUserByEmail(String email){
        return userRepository.findByEmail(email)
@@ -121,18 +121,18 @@ public class UserService implements  UserDetailsService {
     public AppUser findUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElse(null);
-    };
+    }
 
     public AppUser findUserByProviderAndProviderId(String provider, String providerId){
        return userRepository.findByProviderAndProviderId(provider, providerId).orElse(null);
-    };
+    }
 
     public String generateDefaultUsername(String email){
         if (email != null && email.contains("@")) {
             return email.split("@")[0];
         }
         return "user" + System.currentTimeMillis();
-    };
+    }
 
     public AppUser changeUsername(String currentUsername, String newUsername){
        AppUser user = findUserByUsername(currentUsername);
@@ -151,7 +151,7 @@ public class UserService implements  UserDetailsService {
         AppUser user = findUserByUsername(currentUsername);
         if (user == null){
             throw new RuntimeException("User not found");
-        };
+        }
 
         //Cant change email for oAuth users
         if (user.getProvider() != null){
@@ -170,12 +170,12 @@ public class UserService implements  UserDetailsService {
 
         if (user == null){
             throw new RuntimeException("User not found");
-        };
+        }
 
         //Cant change email for oAuth users
         if (user.getProvider() != null){
             throw  new RuntimeException("You can not change this password");
-        };
+        }
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())){
             throw new RuntimeException("Current password is incorrect");
@@ -191,7 +191,7 @@ public class UserService implements  UserDetailsService {
         AppUser user = findUserByUsername(currentUsername);
         if (user == null){
             throw new RuntimeException("User not found");
-        };
+        }
         user.setPrimaryCurrency(primaryCurrency);
         return userRepository.save(user);
     }

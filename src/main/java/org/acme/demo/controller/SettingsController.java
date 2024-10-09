@@ -22,11 +22,15 @@ import java.util.Map;
 @RequestMapping("/settings")
 @Validated
 public class SettingsController {
-    @Autowired
-    private UserService userService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final UserService userService;
+
+    private final JwtUtil jwtUtil;
+
+    @Autowired SettingsController(UserService userService, JwtUtil jwtUtil){
+        this.userService = userService;
+        this.jwtUtil = jwtUtil;
+    }
 
     @PutMapping("/username")
     public ResponseEntity<?> updateUsername(@RequestBody @Valid UsernameUpdateRequestDTO payload, Principal principal){

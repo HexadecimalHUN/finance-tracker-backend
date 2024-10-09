@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,8 +21,22 @@ import java.util.List;
 
 
 @Configuration
-
+@EnableWebSecurity
 public class SecurityConfig {
+
+    private static final String[] SWAGGER_WHITELIST = {
+            // Swagger v2 and v3 endpoints
+            "/v2/api-docs",
+            "/swagger-ui.html",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/webjars/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+    };
+
 
     @Autowired
     @Lazy
@@ -33,27 +48,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-            .cors(httpSecurityCorsConfigurer ->
-                httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource())
-            )
-            .authorizeHttpRequests((requests) -> requests// Allow access to Swagger UI and related endpoints without authentication
-                .requestMatchers("/v3/api-docs/**",
-                        "/swagger-ui.html",
-                        "/swagger-ui/**",
-                        "/swagger-resources/**",
-                        "/configuration/ui",
-                        "/configuration/security",
-                        "/swagger-ui/index.html",
-                        "/webjars/**",
-                        "/auth/register",
-                        "/auth/login").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                // Secure all other endpoints
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS config
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers(SWAGGER_WHITELIST).permitAll() // Allow Swagger access
+                        .requestMatchers("/auth/register", "/auth/login").permitAll() // Open registration and login
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // Admin-only access
+                        .anyRequest().authenticated() // Secure all other endpoints
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless session
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

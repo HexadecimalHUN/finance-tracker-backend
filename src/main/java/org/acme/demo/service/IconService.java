@@ -11,8 +11,13 @@ import java.util.Map;
 
 @Service
 public class IconService {
+
+    private  final IconRepository iconRepository;
+
     @Autowired
-    private IconRepository iconRepository;
+    public IconService(IconRepository iconRepository){
+        this.iconRepository = iconRepository;
+    }
 
 
     private final Map<String, String> predefinedCategoryIconMap = new HashMap<>(){{

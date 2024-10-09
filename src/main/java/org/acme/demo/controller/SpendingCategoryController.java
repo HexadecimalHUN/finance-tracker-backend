@@ -18,14 +18,19 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/categories")
 public class SpendingCategoryController {
-    @Autowired
-    private SpendingCategoryService spendingCategoryService;
+
+    private final SpendingCategoryService spendingCategoryService;
+    private final UserService userService;
+    private final IconService iconService;
 
     @Autowired
-    private UserService userService;
+    public SpendingCategoryController(SpendingCategoryService spendingCategoryService, UserService userService, IconService iconService){
+        this.spendingCategoryService = spendingCategoryService;
+        this.userService = userService;
+        this.iconService = iconService;
+    }
 
-    @Autowired
-    private IconService iconService;
+
 
     //Get all categories for authenticated user
     @GetMapping

@@ -1,6 +1,4 @@
 package org.acme.demo.service;
-
-import jdk.jfr.Category;
 import org.acme.demo.entity.SpendingCategory;
 import org.acme.demo.entity.Transaction;
 import org.acme.demo.repository.TransactionRepository;
@@ -9,13 +7,17 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 public class TransactionService {
+
+    private final TransactionRepository transactionRepository;
+
     @Autowired
-    private TransactionRepository transactionRepository;
+    public TransactionService(TransactionRepository transactionRepository){
+        this.transactionRepository = transactionRepository;
+    }
 
     public List<Transaction>getTransactionsBySpendingCategory(SpendingCategory spendingCategory){
         return transactionRepository.findBySpendingCategory(spendingCategory);
@@ -39,8 +41,6 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(()-> new IllegalArgumentException("Transaction not found"));
         transaction.setDescription(newDescription);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         transaction.setDate(newDate);
         transaction.setAmount(newAmount);
         return transactionRepository.save(transaction);

@@ -8,19 +8,21 @@ import org.acme.demo.entity.SpendingCategory;
 import org.acme.demo.repository.SpendingCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class SpendingCategoryService {
 
-    @Autowired
-    private SpendingCategoryRepository spendingCategoryRepository;
+
+    private final SpendingCategoryRepository spendingCategoryRepository;
+    private final IconService iconService;
 
     @Autowired
-    private IconService iconService;
+    public SpendingCategoryService(SpendingCategoryRepository spendingCategoryRepository, IconService iconService){
+        this.spendingCategoryRepository = spendingCategoryRepository;
+        this.iconService = iconService;
+
+    }
 
     private final List<String> predefinedSpendingCategories = List.of("Groceries", "Household", "Hobbies", "Uncategorized");
 
