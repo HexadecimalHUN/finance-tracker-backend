@@ -1,0 +1,55 @@
+# Java and Maven specific ignores
+/target/
+/pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+src/main/resources/application.properties
+
+# Ignore IDE specific files (for IntelliJ IDEA)
+.idea/
+/*.iml
+/.idea/*
+/*.iws
+/out/
+*.ipr
+
+# Key files (these should not be committed)
+*.pem
+base64_private_key.txt
+base64_public_key.txt
+
+# OS generated files
+.DS_Store
+Thumbs.db
+*.class
+
+# Logs
+*.log
+/logs
+
+# Temporary files
+*.tmp
+*.bak
+
+# Ignore test and build output
+/test-output/
+/*.class
+
+# Ignore git attributes
+.gitattributes
+
+# Ignore other system files
+*.swp
+*.swo
+
+# Ignore compiled dependencies
+*.jar
+*.war
+*.ear
+
