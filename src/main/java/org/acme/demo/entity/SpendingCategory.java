@@ -10,13 +10,14 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Table(name = "spending_category")
 public class SpendingCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
     @ManyToOne
@@ -34,6 +35,15 @@ public class SpendingCategory {
     }
 
     public SpendingCategory(String name, AppUser user, Icon icon){
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Category name cannot be null or empty");
+        }
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+        if (icon == null) {
+            throw new IllegalArgumentException("Icon cannot be null");
+        }
         this.name = name;
         this.user = user;
         this.icon = icon;

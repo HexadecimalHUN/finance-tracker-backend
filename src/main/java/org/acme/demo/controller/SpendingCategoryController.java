@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,12 @@ public class SpendingCategoryController {
 
     //Get all categories for authenticated user
     @GetMapping
-    public ResponseEntity<List<SpendingCategoryDTO>> getUserSpendingCategories(@AuthenticationPrincipal AppUser user){
+    public ResponseEntity<List<SpendingCategoryDTO>> getUserSpendingCategories(Principal principal){
+        AppUser user = userService.findUserByUsername(principal.getName());
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
         List<SpendingCategoryDTO> categories = spendingCategoryService.getUserSpendingCategories(user)
                 .stream()
                 .map(this::convertToDTO)
@@ -44,7 +50,13 @@ public class SpendingCategoryController {
 
     //Creating new category
     @PostMapping
-    public ResponseEntity<SpendingCategoryDTO> addSpendingCategory(@AuthenticationPrincipal AppUser user, @RequestBody SpendingCategoryDTO categoryDTO){
+    public ResponseEntity<SpendingCategoryDTO> addSpendingCategory(Principal principal, @RequestBody SpendingCategoryDTO categoryDTO){
+        System.out.println("Received DTO: " + categoryDTO.getName() + ", " + categoryDTO.getIconName());
+        AppUser user = userService.findUserByUsername(principal.getName());
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
         Icon icon = iconService.getIconByName(categoryDTO.getIconName());
         SpendingCategory createdCategory = spendingCategoryService.addSpendingCategory(user, categoryDTO.getName(), icon.getIconName());
         return ResponseEntity.ok(convertToDTO(createdCategory));
@@ -53,14 +65,24 @@ public class SpendingCategoryController {
 
     //Update category name and icon
     @PutMapping("/{categoryId}")
-    public ResponseEntity<SpendingCategoryDTO> updateSpendingCategory(@AuthenticationPrincipal AppUser user, @PathVariable Long categoryId, @RequestBody SpendingCategoryDTO categoryDTO){
+    public ResponseEntity<SpendingCategoryDTO> updateSpendingCategory(Principal principal, @PathVariable Long categoryId, @RequestBody SpendingCategoryDTO categoryDTO){
+        AppUser user = userService.findUserByUsername(principal.getName());
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
         SpendingCategory updatedCategory = spendingCategoryService.updateSpendingCategory(categoryId, categoryDTO, user);
         return ResponseEntity.ok(convertToDTO(updatedCategory));
     }
 
     //Delete category
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Void>deleteSpendingCategory(@AuthenticationPrincipal AppUser user, @PathVariable Long categoryId){
+    public ResponseEntity<Void>deleteSpendingCategory(Principal principal, @PathVariable Long categoryId){
+        AppUser user = userService.findUserByUsername(principal.getName());
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
         spendingCategoryService.deleteSpendingCategory(categoryId, user);
         return ResponseEntity.noContent().build();
     }

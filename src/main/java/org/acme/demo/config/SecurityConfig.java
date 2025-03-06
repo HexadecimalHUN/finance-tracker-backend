@@ -24,27 +24,19 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] SWAGGER_WHITELIST = {
-            // Swagger v2 and v3 endpoints
-            "/v2/api-docs",
-            "/swagger-ui.html",
-            "/swagger-resources",
-            "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
-            "/webjars/**",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-    };
+    private final JwtRequestFilter jwtRequestFilter;
 
-
-    @Autowired
-    @Lazy
-    private JwtRequestFilter jwtRequestFilter;
-
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter){
+    public SecurityConfig(@Lazy JwtRequestFilter jwtRequestFilter){
         this.jwtRequestFilter = jwtRequestFilter;
     }
+
+    private static final String[] SWAGGER_WHITELIST = {
+            // Swagger v2 and v3 endpoints
+            "/v2/api-docs", "/swagger-ui.html", "/swagger-resources",
+            "/swagger-resources/**", "/configuration/ui", "/configuration/security",
+            "/webjars/**", "/v3/api-docs/**", "/swagger-ui/**",
+    };
+
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -75,7 +67,7 @@ public class SecurityConfig {
         corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));  // Your front-end origin
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowCredentials(true); // Allow credentials like cookies, authorization headers, etc.
-        corsConfiguration.setAllowedHeaders(List.of("*")); // Allow all headers
+        corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With")); // Allow all headers
         corsConfiguration.setMaxAge(3600L); // Cache the response for 3600 seconds (1 hour)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

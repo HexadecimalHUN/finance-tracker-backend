@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,17 +27,23 @@ public class TransactionController {
     private final TransactionService transactionService;
     private final SpendingCategoryService spendingCategoryService;
     private final TransactionRepository transactionRepository;
+    private final UserService userService;
 
     @Autowired
     public  TransactionController(TransactionService transactionService, UserService userService, SpendingCategoryService spendingCategoryService, TransactionRepository transactionRepository){
         this.transactionService = transactionService;
         this.spendingCategoryService = spendingCategoryService;
         this.transactionRepository = transactionRepository;
+        this.userService = userService;
     }
 
     //Get All transactions by category for authenticated users
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<TransactionDTO>> getTransactionsByCategory(@AuthenticationPrincipal AppUser user, @PathVariable Long categoryId){
+    public ResponseEntity<List<TransactionDTO>> getTransactionsByCategory(Principal principal, @PathVariable Long categoryId){
+        AppUser user = userService.findUserByUsername(principal.getName());
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         SpendingCategory category = spendingCategoryService.getUserSpendingCategories(user)
                 .stream()
                 .filter(sc -> sc.getId().equals(categoryId))
@@ -51,7 +58,12 @@ public class TransactionController {
 
     //Get transactions by category and date range
     @GetMapping("/category/{categoryId}/date-range")
-    public ResponseEntity<List<TransactionDTO>> getTransactionsByCategoryAndDateRange(@AuthenticationPrincipal AppUser user, @PathVariable Long categoryId, @RequestParam String startDate, @RequestParam String endDate){
+    public ResponseEntity<List<TransactionDTO>> getTransactionsByCategoryAndDateRange(Principal principal, @PathVariable Long categoryId, @RequestParam String startDate, @RequestParam String endDate){
+        AppUser user = userService.findUserByUsername(principal.getName());
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
         SpendingCategory category = spendingCategoryService.getUserSpendingCategories(user)
                 .stream()
                 .filter(sc -> sc.getId().equals(categoryId))
@@ -66,9 +78,32 @@ public class TransactionController {
         return ResponseEntity.ok(transactions);
     }
 
+    //Get all transactions by date range for an authenticated user
+    @GetMapping("/date-range")
+    public ResponseEntity<List<TransactionDTO>> getTransactionsByDateRange(Principal principal, @RequestParam String startDate, @RequestParam String endDate){
+        AppUser user = userService.findUserByUsername(principal.getName());
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+
+        List<TransactionDTO> transactions = transactionService.getTransactionByUserAndDateRange(user, start, end)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return  ResponseEntity.ok(transactions);
+    }
+
     //Create Transaction
     @PostMapping ("/category/{categoryId}")
-    public ResponseEntity<TransactionDTO> addTransaction(@AuthenticationPrincipal AppUser user, @PathVariable Long categoryId, @RequestBody TransactionDTO transactionDTO){
+    public ResponseEntity<TransactionDTO> addTransaction(Principal principal, @PathVariable Long categoryId, @RequestBody TransactionDTO transactionDTO){
+        AppUser user = userService.findUserByUsername(principal.getName());
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
         SpendingCategory category = spendingCategoryService.getUserSpendingCategories(user)
                 .stream()
                 .filter(sc -> sc.getId().equals(categoryId))
@@ -83,7 +118,12 @@ public class TransactionController {
 
     //Update Transaction
     @PutMapping("/{transactionId}")
-    public ResponseEntity<TransactionDTO> updateTransaction(@AuthenticationPrincipal AppUser user, @PathVariable Long transactionId, @RequestBody TransactionDTO transactionDTO){
+    public ResponseEntity<TransactionDTO> updateTransaction(Principal principal, @PathVariable Long transactionId, @RequestBody TransactionDTO transactionDTO){
+        AppUser user = userService.findUserByUsername(principal.getName());
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
         Transaction updateTransaction = transactionService.updateTransaction(transactionId,
                 transactionDTO.getDescription(),
                 transactionDTO.getTransactionDate(),

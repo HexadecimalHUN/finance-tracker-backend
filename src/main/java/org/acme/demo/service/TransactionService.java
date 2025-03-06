@@ -1,4 +1,5 @@
 package org.acme.demo.service;
+import org.acme.demo.entity.AppUser;
 import org.acme.demo.entity.SpendingCategory;
 import org.acme.demo.entity.Transaction;
 import org.acme.demo.repository.TransactionRepository;
@@ -27,12 +28,16 @@ public class TransactionService {
         return transactionRepository.findBySpendingCategoryAndDateBetween(spendingCategory, startDate, endDate);
     }
 
+    public List<Transaction>getTransactionByUserAndDateRange(AppUser user, LocalDate startDate, LocalDate endDate){
+        return  transactionRepository.findByUserAndDateRange(user, startDate, endDate);
+    }
+
     public Transaction addTransaction(SpendingCategory spendingCategory, String description, LocalDate date, BigDecimal amount){
         Transaction newTransaction = new Transaction();
         newTransaction.setSpendingCategory(spendingCategory);
         newTransaction.setDescription(description);
-        newTransaction.setDate(date); // LocalDate is now expected
-        newTransaction.setAmount(amount); // BigDecimal is now expected
+        newTransaction.setDate(date);
+        newTransaction.setAmount(amount);
 
         return transactionRepository.save(newTransaction);
     }

@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table
+@Table(name = "app_user")
 @Getter
 @Setter
 public class AppUser {
@@ -26,7 +26,6 @@ public class AppUser {
     private String provider;
     private String providerId;
 
-    private String primaryCurrency;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -34,7 +33,7 @@ public class AppUser {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -43,5 +42,8 @@ public class AppUser {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<SpendingCategory> categories = new HashSet<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Limit spendingLimit;
 
 }

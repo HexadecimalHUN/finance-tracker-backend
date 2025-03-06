@@ -1,5 +1,6 @@
 package org.acme.demo.controller;
 
+import lombok.extern.flogger.Flogger;
 import org.acme.demo.dto.IconDTO;
 import org.acme.demo.service.IconService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 @RequestMapping("/icons")
 public class IconController {
 
+    private static final Logger logger = LoggerFactory.getLogger(IconController.class);
     private final IconService iconService;
 
     @Autowired
@@ -33,6 +38,8 @@ public class IconController {
                     return dto;
                 })
                 .collect(Collectors.toList());
+
+        logger.info("Fetched icons: {}", icons);  // Log the list of icons
         return ResponseEntity.ok(icons);
     }
 }

@@ -1,7 +1,6 @@
 package org.acme.demo.controller;
 
 import jakarta.validation.Valid;
-import org.acme.demo.dto.CurrencyUpdateRequestDTO;
 import org.acme.demo.dto.EmailUpdateRequestDTO;
 import org.acme.demo.dto.PasswordUpdateRequestDTO;
 import org.acme.demo.dto.UsernameUpdateRequestDTO;
@@ -66,14 +65,6 @@ public class SettingsController {
         }
     };
 
-    @PutMapping("/currency")
-    public ResponseEntity<?> updateCurrency(@RequestBody @Valid CurrencyUpdateRequestDTO payload, Principal principal){
-        try {
-            return ResponseEntity.ok(userService.setPrimaryCurrency(principal.getName(), payload.getPrimaryCurrency()));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
 
     @GetMapping("/populate")
     public ResponseEntity<Map<String, String>>getUserDetails(Principal principal){
@@ -84,7 +75,6 @@ public class SettingsController {
         Map<String, String>userDetails = new HashMap<>();
         userDetails.put("username", user.getUsername());
         userDetails.put("email", user.getEmail());
-        userDetails.put("primaryCurrency", user.getPrimaryCurrency());
 
         return ResponseEntity.ok(userDetails);
     }

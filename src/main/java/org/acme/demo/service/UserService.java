@@ -46,9 +46,8 @@ public class UserService implements  UserDetailsService {
     }
 
    public AppUser registerUser(String username, String email, String password, String provider, String providerId){
+        Optional<AppUser> existingUser = userRepository.findByEmail(email);
 
-       Optional<AppUser> existingUser = userRepository.findByEmail(email);
-        //Handle OAuth Authentication
        if (existingUser.isPresent()) {
            AppUser user = existingUser.get();
            if (provider != null && providerId != null) {
@@ -64,10 +63,6 @@ public class UserService implements  UserDetailsService {
 
        if (userRepository.findByUsername(username).isPresent()){
            throw new IllegalArgumentException("Username already taken");
-       }
-
-       if (userRepository.findByEmail(email).isPresent()){
-           throw new IllegalArgumentException("Email is already registered");
        }
 
        AppUser newUser = new AppUser();
@@ -187,14 +182,6 @@ public class UserService implements  UserDetailsService {
 
     }
 
-    public AppUser setPrimaryCurrency(String currentUsername, String primaryCurrency){
-        AppUser user = findUserByUsername(currentUsername);
-        if (user == null){
-            throw new RuntimeException("User not found");
-        }
-        user.setPrimaryCurrency(primaryCurrency);
-        return userRepository.save(user);
-    }
 
     //Generating default admin profile
     @PostConstruct
